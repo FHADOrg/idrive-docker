@@ -1,0 +1,13 @@
+# FHAD extension: keep the upstream IDrive client version explicitly pinned.
+# Do not replace with :latest before running version-specific restore tests.
+FROM ghcr.io/snorre-k/idrive-docker:3.8.0
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends util-linux && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --chmod=755 scripts/fhad-entrypoint.sh /usr/local/bin/fhad-entrypoint
+COPY --chmod=755 scripts/fhad-scheduler.sh /usr/local/bin/fhad-scheduler
+COPY --chmod=755 scripts/fhad-backup-once.sh /usr/local/bin/fhad-backup-once
+
+CMD ["/usr/local/bin/fhad-entrypoint"]

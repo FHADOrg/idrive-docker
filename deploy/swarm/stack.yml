@@ -1,0 +1,28 @@
+# Deploy with: docker stack deploy -c deploy/swarm/stack.yml fhad_idrive
+# The image must be published in GHCR by the repository workflow first.
+services:
+  idrive:
+    image: ghcr.io/fhadorg/idrive-docker:0.1.0
+    environment:
+      TZ: Etc/UTC
+      # Enable ONLY after account setup, manual backup and RESTORE tests.
+      IDRIVE_SCHEDULER_ENABLED: "false"
+      IDRIVE_BACKUP_INTERVAL_SECONDS: "300"
+    volumes:
+      - idrive_state:/opt/IDriveForLinux/idriveIt
+      # Replace with the real absolute path ON THE LABELED SWARM NODE.
+      - /srv/fhad/idrive/source:/source/1:ro
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.idrive-backup == true
+      update_config:
+        order: stop-first
+        parallelism: 1
+      restart_policy:
+        condition: any
+
+volumes:
+  idrive_state:
+    driver: local
