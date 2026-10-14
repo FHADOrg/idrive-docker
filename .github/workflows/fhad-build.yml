@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Bash syntax
-        run: bash -n scripts/*.sh
+        run: for f in scripts/*.sh tests/*.sh; do bash -n "$f"; done
       - name: Smoke tests
         run: bash tests/test-backup-once.sh
 
